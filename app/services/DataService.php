@@ -3,7 +3,7 @@ class DataService
 {
     private $mysql;
 
-    function __construct($database_name, $username, $password, $host = 'localhost')
+    function __construct($database_name, $username, $password, $host)
     {
         $this->mysql = mysqli_connect($host, $username, $password, $database_name);
         

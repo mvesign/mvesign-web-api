@@ -6,7 +6,7 @@ class ArticlesController
     public function __construct()
     {
         $this->context = new DataService(
-            Settings::ARTICLES_CONTEXT_NAME, Settings::ARTICLES_CONTEXT_USERNAME, Settings::ARTICLES_CONTEXT_PASSWORD
+            Settings::CONTEXT_NAME, Settings::CONTEXT_USERNAME, Settings::CONTEXT_PASSWORD, Settings::CONTEXT_HOST
         );
     }
 
