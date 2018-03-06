@@ -1,0 +1,16 @@
+# Add CORS headers
+# Header add Access-Control-Allow-Headers: Content-Type
+# Header add Access-Control-Allow-Methods: GET
+Header add Access-Control-Allow-Origin: *
+
+# Possible to rewrite URL's
+RewriteEngine on
+
+# Rewrite the incoming item URLs
+
+RewriteRule ^([a-zA-Z]*)/summary$ index.php?type=$1&summary=true [NC,NE]
+RewriteRule ^([a-zA-Z]*)/(.+)$ index.php?type=$1&reference=$2 [NC,NE]
+RewriteRule ^([a-zA-Z]*)$ index.php?type=$1 [NC,NE]
+
+# Rewrite all other URLs back to the root
+RewriteRule ^(.*)$ index.php
