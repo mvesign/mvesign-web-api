@@ -37,7 +37,7 @@ function handle_request()
 
     if (array_key_exists("reference", $output))
     {
-        $result = $object->retrieve_single($output["reference"]);
+        $result = $object->retrieve_by_reference($output["reference"]);
     }
     else
     {

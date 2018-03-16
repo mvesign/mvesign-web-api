@@ -10,7 +10,7 @@ class TagsController
         );
     }
 
-    public function retrieve_single($reference)
+    public function retrieve_by_reference($reference)
     {
         $articles = $this->context->retrieve_rows(
             $this->context->perform_query(

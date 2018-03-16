@@ -10,30 +10,7 @@ class ArticlesController
         );
     }
 
-    public function retrieve_multiple($limit, $offset)
-    {
-        //"SELECT * FROM articles LIMIT $offset, $limit"
-        $articles = $this->context->retrieve_rows(
-            $this->context->perform_query(
-                "SELECT A.id, A.reference, A.title, A.content, A.created_on, GROUP_CONCAT(T.value SEPARATOR ';') AS tags
-                FROM articles A
-                    LEFT JOIN tags T ON T.article_id = A.id
-                GROUP BY A.id, A.reference, A.title, A.content, A.created_on
-                LIMIT $offset, $limit"
-            )
-        );
-
-        $result = array();
-
-        for($count = 0; $count < count($articles); $count++)
-        {
-            $result[$count] = new Article($articles[$count]);
-        }
-
-        return $result;
-    }
-
-    public function retrieve_single($reference)
+    public function retrieve_by_reference($reference)
     {
         if (strlen($reference) !== 36)
         {
@@ -56,6 +33,28 @@ class ArticlesController
         }
         
         return new Article($article);
+    }
+
+    public function retrieve_multiple($limit, $offset)
+    {
+        $articles = $this->context->retrieve_rows(
+            $this->context->perform_query(
+                "SELECT A.id, A.reference, A.title, A.content, A.created_on, GROUP_CONCAT(T.value SEPARATOR ';') AS tags
+                FROM articles A
+                    LEFT JOIN tags T ON T.article_id = A.id
+                GROUP BY A.id, A.reference, A.title, A.content, A.created_on
+                LIMIT $offset, $limit"
+            )
+        );
+
+        $result = array();
+
+        for($count = 0; $count < count($articles); $count++)
+        {
+            $result[$count] = new Article($articles[$count]);
+        }
+
+        return $result;
     }
 
     public function retrieve_summary($limit, $offset)
