@@ -7,7 +7,7 @@ class Article
         $this->createdOn = $result_set->created_on;
         $this->title = $result_set->title;
         $this->reference = $result_set->reference;
-        $this->tags = explode(";", $result_set->tags);
+        $this->tags = array_filter(explode(";", $result_set->tags));
     }
 
     public $reference;
