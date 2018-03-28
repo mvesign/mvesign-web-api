@@ -8,4 +8,6 @@ class Settings
     const CONTEXT_USERNAME = "";
 
     const CONTEXT_PASSWORD = "";
+
+    const USER_PASSWORD = "";
 }

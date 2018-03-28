@@ -5,6 +5,7 @@ setlocale(LC_ALL, 'nl_NL');
 
 require_once("Settings.php");
 require_once("services/DataService.php");
+require_once("services/ValidationService.php");
 require_once("controlers/ArticlesController.php");
 require_once("controlers/TagsController.php");
 require_once("models/Article.php");
@@ -29,13 +30,25 @@ function handle_request()
     $httpRequestMethod = $_SERVER['REQUEST_METHOD'];
     if ($httpRequestMethod !== "GET")
     {
-        return new CustomError(102, "HTTP request method '$httpRequestMethod' is not supported for model type '$modelType'.");
+        if ($className !== "ArticleController" && $httpRequestMethod !== "POST")
+        {
+            return new CustomError(102, "HTTP request method '$httpRequestMethod' is not supported for model type '$modelType'.");
+        }
     }
 
     $object = new $className();
     $result = null;
 
-    if (array_key_exists("reference", $output))
+    if ($httpRequestMethod === "POST")
+    {
+        if (!ValidationService::is_valid_password($_SERVER["X-MVESIGN-PASSWORD"]))
+        {
+            return new CustomError(103, "No valid password supplied in header.");
+        }
+        
+        $result = $object->create(json_decode(http_get_request_body()));
+    }
+    else if (array_key_exists("reference", $output))
     {
         $result = $object->retrieve_by_reference($output["reference"]);
     }

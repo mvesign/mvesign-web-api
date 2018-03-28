@@ -10,6 +10,34 @@ class ArticlesController
         );
     }
 
+    public function create($article)
+    {
+        $result = $this->validate_property($article, "title", 10);
+        if ($result !== null)
+        {
+            return $result;
+        }
+
+        $result = $this->validate_property($article, "content", 100);
+        if ($result !== null)
+        {
+            return $result;
+        }
+
+        $article = Article::FromApi($article->title, $article->content);
+
+        $this->context->perform_query(
+            "INSERT INTO articles (
+                reference, title, content, created_on
+            ) VALUES (
+                '".$this->context->escape($article->reference)."', '".$this->context->escape($article->title)."',
+                '".$this->context->escape($article->content)."', '".$this->context->escape($article->created_on)."'
+            )"
+        );
+
+        return $this->retrieve_by_reference($article->reference);
+    }
+
     public function retrieve_by_reference($reference)
     {
         if (strlen($reference) !== 36)
@@ -32,7 +60,7 @@ class ArticlesController
             return new CustomError(201, "No unique article found for reference '$reference'.");
         }
         
-        return new Article($article);
+        return Article::FromResultSet($article);
     }
 
     public function retrieve_multiple($limit, $offset)
@@ -51,7 +79,7 @@ class ArticlesController
 
         for($count = 0; $count < count($articles); $count++)
         {
-            $result[$count] = new Article($articles[$count]);
+            $result[$count] = Article::FromResultSet($articles[$count]);
         }
 
         return $result;
@@ -71,5 +99,18 @@ class ArticlesController
         }
         
         return new Summary($limit, $offset, $summary);
+    }
+
+    private function validate_property($article, $property_name, $minimum_length)
+    {
+        if (!property_exists($article, $property_name))
+        {
+            return new CustomError(201, "Article has not the mandatory '".$property_name."' property.");
+        }
+
+        if (strlen($article->$property_name) < $minimum_length)
+        {
+            return new CustomError(202, "Article has an invalid '".$property_name."' property.");
+        }
     }
 }
