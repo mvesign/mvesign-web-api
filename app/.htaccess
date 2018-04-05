@@ -7,10 +7,11 @@ Header add Access-Control-Allow-Origin: *
 RewriteEngine on
 
 # Rewrite the incoming item URLs
-
-RewriteRule ^([a-zA-Z]*)/summary$ index.php?type=$1&summary=true [NC,NE]
-RewriteRule ^([a-zA-Z]*)/(.+)$ index.php?type=$1&reference=$2 [NC,NE]
-RewriteRule ^([a-zA-Z]*)$ index.php?type=$1 [NC,NE]
+RewriteRule ^articles/(.+)$ index.php?type=articles&reference=$1 [NC,NE]
+RewriteRule ^articles$ index.php?type=articles [NC,NE]
+RewriteRule ^tags/(.+)$ index.php?type=tags&reference=$1 [NC,NE]
+RewriteRule ^summary/articles$ index.php?type=articles&summary=true [NC,NE]
+RewriteRule ^summary/tags/(.+)$ index.php?type=tags&reference=$1&summary=true [NC,NE]
 
 # Rewrite all other URLs back to the root
 RewriteRule ^(.*)$ index.php

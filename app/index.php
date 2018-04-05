@@ -54,12 +54,12 @@ function handle_request()
     }
     else
     {
-        $limit = array_key_exists("limit", $output) ? $output["limit"] : 20;
-        $offset = array_key_exists("offset", $output) ? $output["offset"] : 0;
+        $take = array_key_exists("take", $output) ? $output["take"] : 20;
+        $skip = array_key_exists("skip", $output) ? $output["skip"] : 0;
         
         $result = array_key_exists("summary", $output)
-            ? $object->retrieve_summary($limit, $offset)
-            : $object->retrieve_multiple($limit, $offset);
+            ? $object->retrieve_summary($take, $skip)
+            : $object->retrieve_multiple($take, $skip);
     }
 
     return $result;

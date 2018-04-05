@@ -36,7 +36,7 @@ class TagsController
         return $result;
     }
 
-    public function retrieve_summary($limit, $offset)
+    public function retrieve_summary($take, $skip)
     {
         $summary = $this->context->retrieve_row(
             $this->context->perform_query(
@@ -49,6 +49,6 @@ class TagsController
             return new CustomError(103, "No summary could be created for the articles.");
         }
         
-        return new Summary($limit, $offset, $summary);
+        return new Summary($take, $skip, $summary);
     }
 }

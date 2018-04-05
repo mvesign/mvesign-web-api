@@ -35,6 +35,8 @@ class ArticlesController
             )"
         );
 
+        //TODO Support create of tags
+
         return $this->retrieve_by_reference($article->reference);
     }
 
@@ -63,7 +65,7 @@ class ArticlesController
         return Article::FromResultSet($article);
     }
 
-    public function retrieve_multiple($limit, $offset)
+    public function retrieve_multiple($take, $skip)
     {
         $articles = $this->context->retrieve_rows(
             $this->context->perform_query(
@@ -71,7 +73,7 @@ class ArticlesController
                 FROM articles A
                     LEFT JOIN tags T ON T.article_id = A.id
                 GROUP BY A.id, A.reference, A.title, A.content, A.created_on
-                LIMIT $offset, $limit"
+                LIMIT $skip, $take"
             )
         );
 
@@ -85,7 +87,7 @@ class ArticlesController
         return $result;
     }
 
-    public function retrieve_summary($limit, $offset)
+    public function retrieve_summary($take, $skip)
     {
         $summary = $this->context->retrieve_row(
             $this->context->perform_query(
@@ -98,7 +100,7 @@ class ArticlesController
             return new CustomError(103, "No summary could be created for the articles.");
         }
         
-        return new Summary($limit, $offset, $summary);
+        return new Summary($take, $skip, $summary);
     }
 
     private function validate_property($article, $property_name, $minimum_length)
