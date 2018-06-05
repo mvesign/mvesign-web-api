@@ -7,9 +7,11 @@ require_once("Settings.php");
 require_once("services/DataService.php");
 require_once("services/ValidationService.php");
 require_once("controlers/ArticlesController.php");
+require_once("controlers/SnippetsController.php");
 require_once("controlers/TagsController.php");
 require_once("models/Article.php");
 require_once("models/CustomError.php");
+require_once("models/Snippet.php");
 require_once("models/Summary.php");
 
 function handle_request()

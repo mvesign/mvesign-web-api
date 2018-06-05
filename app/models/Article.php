@@ -9,28 +9,34 @@ class Article
         $this->reference = implode("-", array(substr($hash, 0, 8), substr($hash, 8, 4), substr($hash, 12, 4), substr($hash, 16, 4), substr($hash, 20, 12)));
     }
 
-    public static function FromApi($title, $content)
+    public static function FromApi($title, $snippets)
     {
         $instance = new self();
-        $instance->content = $content;
+        $instance->snippets = $snippets;
         $instance->title = $title;
         return $instance;
     }
 
-    public static function FromResultSet($result_set)
+    public static function FromResultSet($result_set, $with_references)
     {
         $instance = new self();
-        $instance->content = $result_set->content;
         $instance->createdOn = $result_set->created_on;
-        $instance->title = $result_set->title;
         $instance->reference = $result_set->reference;
-        $instance->tags = array_filter(explode(";", $result_set->tags));
+        $instance->title = $result_set->title;
+        $instance->tags = explode(";;;", $result_set->tags);
+        
+        if ($with_references === true)
+        {
+            $instance->references = explode(";;;", $result_set->references);
+        }
+
         return $instance;
     }
 
     public $reference;
     public $title;
-    public $content;
     public $createdOn;
     public $tags;
+    public $snippets;
+    public $references;
 }
