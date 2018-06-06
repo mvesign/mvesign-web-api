@@ -23,11 +23,11 @@ class Article
         $instance->createdOn = $result_set->created_on;
         $instance->reference = $result_set->reference;
         $instance->title = $result_set->title;
-        $instance->tags = explode(";;;", $result_set->tags);
+        $instance->tags = array_filter(explode(";;;", $result_set->tags));
         
         if ($with_references === true)
         {
-            $instance->references = explode(";;;", $result_set->references);
+            $instance->references = array_filter(explode(";;;", $result_set->references));
         }
 
         return $instance;
