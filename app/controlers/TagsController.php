@@ -14,15 +14,15 @@ class TagsController
     {
         $articles = $this->context->retrieve_rows(
             $this->context->perform_query(
-                "SELECT A.id, A.reference, A.title, A.content, A.created_on, GROUP_CONCAT(T.value SEPARATOR ';') AS tags
-                FROM articles A
-                    INNER JOIN tags T ON T.article_id = A.id
-                WHERE A.id IN (
-                    SELECT IT.article_id
-                    FROM tags IT
-                    WHERE IT.value = '".$this->context->escape($reference)."'
+                "SELECT A.`id`, A.`reference`, A.`title`, A.`content`, A.`created_on`, GROUP_CONCAT(T.`value` SEPARATOR ';') AS tags
+                FROM `articles` A
+                    INNER JOIN `tags` T ON T.`article_id` = A.`id`
+                WHERE A.`id` IN (
+                    SELECT IT.`article_id`
+                    FROM `tags` IT
+                    WHERE IT.`value` = '".$this->context->escape($reference)."'
                 )
-                GROUP BY A.id, A.reference, A.title, A.content, A.created_on"
+                GROUP BY A.`id`, A.`reference`, A.`title`, A.`content`, A.`created_on`"
             )
         );
 
@@ -40,7 +40,7 @@ class TagsController
     {
         $summary = $this->context->retrieve_row(
             $this->context->perform_query(
-                "SELECT COUNT(*) AS numberOfItems FROM articles"
+                "SELECT COUNT(`id`) AS numberOfItems FROM articles"
             )
         );
 

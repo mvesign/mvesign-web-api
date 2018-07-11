@@ -19,11 +19,11 @@ class SnippetsController
 
         $query_results = $this->context->retrieve_rows(
             $this->context->perform_query(
-                "SELECT S.value, S.highlight, S.language
-                FROM snippets S
-                    INNER JOIN articles A ON A.id = S.article_id
-                WHERE A.reference = '".$this->context->escape($article_reference)."'
-                ORDER BY S.sequence"
+                "SELECT S.`type`, S.`value`, S.`language`
+                FROM `snippets` S
+                    INNER JOIN `articles` A ON A.`id` = S.`article_id`
+                WHERE A.`reference` = '".$this->context->escape($article_reference)."'
+                ORDER BY S.`sequence`"
             )
         );
 

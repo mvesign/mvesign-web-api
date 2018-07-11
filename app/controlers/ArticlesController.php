@@ -22,7 +22,7 @@ class ArticlesController
 
         $this->context->perform_query(
             "INSERT INTO articles (
-                reference, title
+                `reference`, `title`
             ) VALUES (
                 '".$this->context->escape($article->reference)."', '".$this->context->escape($article->title)."'
             )"
@@ -31,6 +31,8 @@ class ArticlesController
         //TODO Support create of tags
 
         //TODO Support create of references
+        
+        //TODO Support create of snippets
 
         return $this->retrieve_by_reference($article->reference);
     }
@@ -44,14 +46,14 @@ class ArticlesController
 
         $query_result = $this->context->retrieve_row(
             $this->context->perform_query(
-                "SELECT A.id, A.reference, A.title, A.created_on,
-                    GROUP_CONCAT(DISTINCT T.value SEPARATOR ';;;') AS tags,
-                    GROUP_CONCAT(DISTINCT R.url SEPARATOR ';;;') AS `references`
-                FROM articles A
-                    LEFT JOIN tags T ON T.article_id = A.id
-                    LEFT JOIN `references` R ON R.article_id = A.id
-                WHERE A.reference = '".$this->context->escape($reference)."'
-                GROUP BY A.id, A.reference, A.title, A.created_on"
+                "SELECT A.`id`, A.`reference`, A.`title`, A.`created_on`,
+                    GROUP_CONCAT(DISTINCT T.`value` SEPARATOR ';;;') AS tags,
+                    GROUP_CONCAT(DISTINCT R.`url` SEPARATOR ';;;') AS `references`
+                FROM `articles` A
+                    LEFT JOIN `tags` T ON T.`article_id` = A.`id`
+                    LEFT JOIN `references` R ON R.`article_id` = A.`id`
+                WHERE A.`reference` = '".$this->context->escape($reference)."'
+                GROUP BY A.`id`, A.`reference`, A.`title`, A.`created_on`"
             )
         );
 
@@ -70,10 +72,10 @@ class ArticlesController
     {
         $query_results = $this->context->retrieve_rows(
             $this->context->perform_query(
-                "SELECT A.id, A.reference, A.title, A.created_on, GROUP_CONCAT(DISTINCT T.value SEPARATOR ';;;') AS tags
-                FROM articles A
-                    LEFT JOIN tags T ON T.article_id = A.id
-                GROUP BY A.id, A.reference, A.title, A.created_on
+                "SELECT A.`id`, A.`reference`, A.`title`, A.`created_on`, GROUP_CONCAT(DISTINCT T.`value` SEPARATOR ';;;') AS tags
+                FROM `articles` A
+                    LEFT JOIN `tags` T ON T.`article_id` = A.`id`
+                GROUP BY A.`id`, A.`reference`, A.`title`, A.`created_on`
                 LIMIT $skip, $take"
             )
         );
@@ -92,7 +94,7 @@ class ArticlesController
     {
         $summary = $this->context->retrieve_row(
             $this->context->perform_query(
-                "SELECT COUNT(*) AS numberOfItems FROM articles"
+                "SELECT COUNT(`id`) AS numberOfItems FROM articles"
             )
         );
 

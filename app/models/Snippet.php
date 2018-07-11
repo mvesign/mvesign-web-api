@@ -5,11 +5,11 @@ class Snippet
     {
     }
 
-    public static function FromApi($value, $language)
+    public static function FromApi($type, $value, $language)
     {
         $instance = new self();
+        $instance->type = $type;
         $instance->value = $value;
-        $instance->highlight = !empty($language) ? 1 : 0;
         $instance->language = $language;
         return $instance;
     }
@@ -18,12 +18,12 @@ class Snippet
     {
         $instance = new self();
         $instance->value = $result_set->value;
-        $instance->highlight = intval($result_set->highlight);
+        $instance->type = $result_set->type;
         $instance->language = $result_set->language;
         return $instance;
     }
 
+    public $type;
     public $value;
-    public $highlight;
     public $language;
 }
