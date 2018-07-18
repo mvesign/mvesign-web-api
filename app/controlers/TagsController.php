@@ -12,28 +12,28 @@ class TagsController
 
     public function retrieve_by_reference($reference)
     {
-        $articles = $this->context->retrieve_rows(
+        $query_results = $this->context->retrieve_rows(
             $this->context->perform_query(
-                "SELECT A.`id`, A.`reference`, A.`title`, A.`content`, A.`created_on`, GROUP_CONCAT(T.`value` SEPARATOR ';') AS tags
+                "SELECT A.`id`, A.`reference`, A.`title`, A.`created_on`, GROUP_CONCAT(DISTINCT T.`value` SEPARATOR ';;;') AS tags
                 FROM `articles` A
-                    INNER JOIN `tags` T ON T.`article_id` = A.`id`
+                    LEFT JOIN `tags` T ON T.`article_id` = A.`id`
                 WHERE A.`id` IN (
                     SELECT IT.`article_id`
                     FROM `tags` IT
-                    WHERE IT.`value` = '".$this->context->escape($reference)."'
+                    WHERE IT.`value` LIKE '%".$this->context->escape($reference)."%'
                 )
-                GROUP BY A.`id`, A.`reference`, A.`title`, A.`content`, A.`created_on`"
+                GROUP BY A.`id`, A.`reference`, A.`title`, A.`created_on`"
             )
         );
 
-        $result = array();
+        $articles = array();
 
-        for($count = 0; $count < count($articles); $count++)
+        for($count = 0; $count < count($query_results); $count++)
         {
-            $result[$count] = new Article($articles[$count]);
+            $articles[$count] = Article::FromResultSet($query_results[$count], false);
         }
 
-        return $result;
+        return $articles;
     }
 
     public function retrieve_summary($take, $skip)
