@@ -48,7 +48,7 @@ class ArticlesController
             $this->context->perform_query(
                 "SELECT A.`id`, A.`reference`, A.`title`, A.`created_on`,
                     GROUP_CONCAT(DISTINCT T.`value` SEPARATOR ';;;') AS tags,
-                    GROUP_CONCAT(DISTINCT R.`url` SEPARATOR ';;;') AS `references`
+                    GROUP_CONCAT(DISTINCT R.`url` ORDER BY R.`sequence` SEPARATOR ';;;') AS `references`
                 FROM `articles` A
                     LEFT JOIN `tags` T ON T.`article_id` = A.`id`
                     LEFT JOIN `references` R ON R.`article_id` = A.`id`
@@ -76,6 +76,7 @@ class ArticlesController
                 FROM `articles` A
                     LEFT JOIN `tags` T ON T.`article_id` = A.`id`
                 GROUP BY A.`id`, A.`reference`, A.`title`, A.`created_on`
+                ORDER BY A.`created_on` DESC
                 LIMIT $skip, $take"
             )
         );
