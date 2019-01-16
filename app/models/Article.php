@@ -9,15 +9,23 @@ class Article
         $this->reference = implode("-", array(substr($hash, 0, 8), substr($hash, 8, 4), substr($hash, 12, 4), substr($hash, 16, 4), substr($hash, 20, 12)));
     }
 
-    public static function FromApi($title, $snippets)
+    public static function FromApi(
+        $article,
+        $snippets
+    )
     {
         $instance = new self();
-        $instance->snippets = $snippets;
-        $instance->title = $title;
+        $instance->references = $article->references;
+        $instance->snippets = $article->snippets;
+        $instance->tags = $article->tags;
+        $instance->title = $article->title;
         return $instance;
     }
 
-    public static function FromResultSet($result_set, $with_references)
+    public static function FromResultSet(
+        $result_set,
+        $with_references
+    )
     {
         $instance = new self();
         $instance->createdOn = $result_set->created_on;
@@ -26,9 +34,7 @@ class Article
         $instance->tags = array_filter(explode(";;;", $result_set->tags));
         
         if ($with_references === true)
-        {
             $instance->references = array_filter(explode(";;;", $result_set->references));
-        }
 
         return $instance;
     }

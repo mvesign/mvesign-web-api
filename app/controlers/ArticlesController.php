@@ -10,13 +10,13 @@ class ArticlesController
         $this->snippets_controller = new SnippetsController($this->context);
     }
 
-    public function create($article)
+    public function create(
+        $article
+    )
     {
         $validate_result = $this->validate($article);
         if ($validate_result !== null)
-        {
             return $validate_result;
-        }
 
         $article = Article::FromApi($article->title, $article->snippets);
 
@@ -28,21 +28,57 @@ class ArticlesController
             )"
         );
 
-        //TODO Support create of tags
+        if (is_array($article->tags) && count($article->tags) > 0)
+        {
+            foreach ($article->tags as &$tag)
+                $tag = "SELECT $tag AS `tag`";
 
-        //TODO Support create of references
+            $this->context->perform_query(
+                "INSERT INTO tags (`article_id`, `value`)
+                SELECT A.`id`, T.`tag`
+                FROM articles A,
+                    (".implode(" UNION ", $article->tags).") T
+                WHERE A.`reference` = '$article->reference';"
+            );
+        }
+
+        if (is_array($article->references) && count($article->references) > 0)
+        {
+            foreach ($article->references as &$reference)
+                $reference = "SELECT $reference->url AS `url`, $reference->sequence AS `sequence`";
+
+            $this->context->perform_query(
+                "INSERT INTO references (`article_id`, `url`, `sequence`)
+                SELECT A.`id`, R.`url`, R.`sequence`
+                FROM articles A,
+                    (".implode(" UNION ", $article->reference).") R
+                WHERE A.`reference` = '$article->reference';"
+            );
+        }
         
-        //TODO Support create of snippets
+        if (is_array($article->snippets) && count($article->snippets) > 0)
+        {
+            foreach ($article->snippets as &$snippet)
+                $snippet = "SELECT $snippet->type AS `type`, $snippet->value AS `value`, $snippet->highlight AS `highlight`, $snippet->language AS `language`, $snippet->sequence AS `sequence`";
+
+            $this->context->perform_query(
+                "INSERT INTO references (`article_id`, `type`, `value`, `highlight`, `language`, `sequence`)
+                SELECT A.`id`, S.`type`, S.`value`, S.`highlight`, S.`language`, S.`sequence`
+                FROM articles A,
+                    (".implode(" UNION ", $article->snippet).") S
+                WHERE A.`reference` = '$article->snippet';"
+            );
+        }
 
         return $this->retrieve_by_reference($article->reference);
     }
 
-    public function retrieve_by_reference($reference)
+    public function retrieve_by_reference(
+        $reference
+    )
     {
         if (strlen($reference) !== 36)
-        {
             return new CustomError(201, "Reference must be in the valid format, like '12345678-1234-1234-1234-1234567890AB'.");
-        }
 
         $query_result = $this->context->retrieve_row(
             $this->context->perform_query(
@@ -58,9 +94,7 @@ class ArticlesController
         );
 
         if (!$query_result)
-        {
             return new CustomError(201, "No unique article found for reference '$reference'.");
-        }
 
         $article = Article::FromResultSet($query_result, true);
         $article->snippets = $this->snippets_controller->retrieve_by_article_reference($article->reference);
@@ -68,7 +102,10 @@ class ArticlesController
         return $article;
     }
 
-    public function retrieve_multiple($take, $skip)
+    public function retrieve_multiple(
+        $take,
+        $skip
+    )
     {
         $query_results = $this->context->retrieve_rows(
             $this->context->perform_query(
@@ -84,14 +121,15 @@ class ArticlesController
         $articles = array();
 
         for($count = 0; $count < count($query_results); $count++)
-        {
             $articles[$count] = Article::FromResultSet($query_results[$count], false);
-        }
 
         return $articles;
     }
 
-    public function retrieve_summary($take, $skip)
+    public function retrieve_summary(
+        $take,
+        $skip
+    )
     {
         $summary = $this->context->retrieve_row(
             $this->context->perform_query(
@@ -100,42 +138,38 @@ class ArticlesController
         );
 
         if (!$summary)
-        {
             return new CustomError(103, "No summary could be created for the articles.");
-        }
         
         return new Summary($take, $skip, $summary);
     }
 
-    public function validate($article)
+    public function validate(
+        $article
+    )
     {
+        //TODO Check every property
+        
         if (!property_exists($article, "title"))
-        {
             return new CustomError(201, "Article has not the mandatory 'title' property.");
-        }
 
         $title_length = strlen($article->title);
         if ($title_length < 5 || $title_length > 50)
-        {
             return new CustomError(202, "Article requires the 'title' property to be between 5 and 50 characters.");
-        }
 
         if (!property_exists($article, "snippets"))
-        {
             return new CustomError(201, "Article has not the mandatory 'snippets' property.");
-        }
 
         if ($article->snippets !== null && count($article->snippets) <= 0)
-        {
             return new CustomError(201, "Article must at least contain one item in the 'snippets' property.");
-        }
 
+        $types = array("text", "code", "image");
         foreach ($article->snippets as $snippet)
         {
-            if (strlen($snippet) < 30)
-            {
-                return new CustomError(202, "Article requires the 'snippets' property to have each snippet above 30 characters.");
-            }
+            if (!in_aray($snippet->type, $types))
+                return new CustomError(202, "Article requires the 'snippets.type' property to be 'text', 'code' or 'image'.");
+
+            if (strlen($snippet->value) < 30)
+                return new CustomError(202, "Article requires the 'snippets.value' property to have each snippet above 30 characters.");
         }
     }
 }

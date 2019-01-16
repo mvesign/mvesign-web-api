@@ -10,7 +10,9 @@ class TagsController
         );
     }
 
-    public function retrieve_by_reference($reference)
+    public function retrieve_by_reference(
+        $reference
+    )
     {
         $query_results = $this->context->retrieve_rows(
             $this->context->perform_query(
@@ -29,9 +31,7 @@ class TagsController
         $articles = array();
 
         for($count = 0; $count < count($query_results); $count++)
-        {
             $articles[$count] = Article::FromResultSet($query_results[$count], false);
-        }
 
         return $articles;
     }
@@ -45,9 +45,7 @@ class TagsController
         );
 
         if (!$summary)
-        {
             return new CustomError(103, "No summary could be created for the articles.");
-        }
         
         return new Summary($take, $skip, $summary);
     }

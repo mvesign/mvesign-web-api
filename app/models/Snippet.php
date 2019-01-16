@@ -5,7 +5,11 @@ class Snippet
     {
     }
 
-    public static function FromApi($type, $value, $language)
+    public static function FromApi(
+        $type,
+        $value,
+        $language
+    )
     {
         $instance = new self();
         $instance->type = $type;
@@ -14,7 +18,10 @@ class Snippet
         return $instance;
     }
 
-    public static function FromResultSet($result_set, $with_references)
+    public static function FromResultSet(
+        $result_set,
+        $with_references
+    )
     {
         $instance = new self();
         $instance->value = $result_set->value;

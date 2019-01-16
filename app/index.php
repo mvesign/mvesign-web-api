@@ -18,25 +18,17 @@ function handle_request()
 {
     parse_str($_SERVER['QUERY_STRING'], $output);
     if (!array_key_exists("type", $output))
-    {
         return new CustomError(101, "Model type must be present at the request.");
-    }
 
     $modelType = $output["type"];
     $className = $modelType."Controller";
     if (!class_exists($className))
-    {
         return new CustomError(101, "No model type found for '$modelType'.");
-    }
 
     $httpRequestMethod = $_SERVER['REQUEST_METHOD'];
     if ($httpRequestMethod !== "GET")
-    {
         if ($className !== "ArticleController" && $httpRequestMethod !== "POST")
-        {
             return new CustomError(102, "HTTP request method '$httpRequestMethod' is not supported for model type '$modelType'.");
-        }
-    }
 
     $object = new $className();
     $result = null;
@@ -44,16 +36,12 @@ function handle_request()
     if ($httpRequestMethod === "POST")
     {
         if (!ValidationService::is_valid_password($_SERVER["X-MVESIGN-PASSWORD"]))
-        {
             return new CustomError(103, "No valid password supplied in header.");
-        }
         
         $result = $object->create(json_decode(http_get_request_body()));
     }
     else if (array_key_exists("reference", $output))
-    {
         $result = $object->retrieve_by_reference($output["reference"]);
-    }
     else
     {
         $take = array_key_exists("take", $output) ? $output["take"] : 20;

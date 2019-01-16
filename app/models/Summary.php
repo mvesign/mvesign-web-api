@@ -1,7 +1,11 @@
 <?php
 class Summary
 {
-    public function __construct($take, $skip, $result_set)
+    public function __construct(
+        $take,
+        $skip,
+        $result_set
+    )
     {
         $this->currentPage = ceil($skip / $take) + 1;
         $this->itemsPerPage = $take;
